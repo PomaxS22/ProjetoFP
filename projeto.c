@@ -106,15 +106,44 @@ void ler_tipo(char tipo[]) {
 }
 
 // MÓDULO DE ESTUDANTES
+int validar_email(const char email[]) {
+    int tem_arroba = 0;
+    int tem_ponto = 0;
+    
+    // Verificar cada caractere do email
+    for(int i = 0; email[i] != '\0'; i++) {
+        if(email[i] == '@') {
+            tem_arroba = 1;
+        }
+        if(email[i] == '.') {
+            tem_ponto = 1;
+        }
+    }
+    
+    return (tem_arroba && tem_ponto);
+}
+
 int ler_estudante(Estudante estudantes[], int contador) {
+    char email_temp[MAX_STRING];
+    int email_valido;
+    
     estudantes[contador].id = contador + 1;
     estudantes[contador].numero = ler_numero("Indique o numero do estudante entre", 2000000, 2999999);
     
     printf("\nIndique o nome do estudante: ");
     scanf(" %99[^\n]s", estudantes[contador].nome);
     
-    printf("\nIndique o email do estudante: ");
-    scanf(" %99[^\n]s", estudantes[contador].email);
+    do {
+        printf("\nIndique o email do estudante (deve conter @ e .): ");
+        scanf(" %99[^\n]s", email_temp);
+        
+        email_valido = validar_email(email_temp);
+        if(!email_valido) {
+            printf("\nEmail invalido! O email deve conter @ e .");
+        }
+    } while(!email_valido);
+    
+    strcpy(estudantes[contador].email, email_temp);
     
     return contador + 1;
 }
