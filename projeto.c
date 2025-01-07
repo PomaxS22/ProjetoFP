@@ -602,10 +602,8 @@ int main() {
                                     fichas, &num_fichas,
                                     exercicios, &num_exercicios,
                                     submissoes, &num_submissoes)) {
-                    printf("\nDados carregados com sucesso!");
-                } else {
-                    printf("\nErro ao carregar dados!");
                 }
+    
                 getchar(); getchar();
                 break;
         }
