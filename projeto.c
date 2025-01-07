@@ -125,16 +125,129 @@ void ler_tipo(char tipo[])
 }
 
 // MÓDULO DE ESTUDANTES
+
+// Função para validar formato do email
+int validar_email(const char *email) {
+    int tem_arroba = 0;
+    int tem_ponto = 0;
+    int pos_arroba = -1;
+    int pos_ponto = -1;
+    int len = strlen(email);
+
+    // Email não pode ser vazio ou maior que o tamanho máximo permitido
+    if (len == 0 || len >= MAX_STRING) {
+        return 0;
+    }
+
+    // Verificar caracteres válidos e posição do @ e .
+    for (int i = 0; i < len; i++) {
+        char c = email[i];
+        
+        // Permitir apenas letras, números, @, ., - e _
+        if (!isalnum(c) && c != '@' && c != '.' && c != '-' && c != '_') {
+            return 0;
+        }
+
+        if (c == '@') {
+            if (tem_arroba) { // Não pode ter mais de um @
+                return 0;
+            }
+            tem_arroba = 1;
+            pos_arroba = i;
+        }
+        
+        if (c == '.') {
+            tem_ponto = 1;
+            pos_ponto = i;
+        }
+    }
+
+    // Verificar se tem @ e .
+    if (!tem_arroba || !tem_ponto) {
+        return 0;
+    }
+
+    // Verificar se tem texto antes do @
+    if (pos_arroba == 0) {
+        return 0;
+    }
+
+    // Verificar se tem texto entre @ e .
+    if (pos_ponto <= pos_arroba + 1) {
+        return 0;
+    }
+
+    // Verificar se tem texto depois do último ponto
+    if (pos_ponto == len - 1) {
+        return 0;
+    }
+
+    return 1;
+}
+
+// Função para ler email com validação
+void ler_email(char *email) {
+    char input[MAX_STRING];
+    int valido;
+    
+    do {
+        valido = 0;
+        printf("\nIndique o email do estudante: ");
+        
+        if (fgets(input, MAX_STRING, stdin) != NULL) {
+            // Remover o \n do final da string
+            input[strcspn(input, "\n")] = '\0';
+            
+            if (validar_email(input)) {
+                valido = 1;
+                strcpy(email, input);
+            } else {
+                printf("Email invalido! O email deve conter @ e . no formato correto.\n");
+            }
+        }
+        
+        if (!valido) {
+            // Limpar o buffer de entrada se necessário
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
+        }
+        
+    } while (!valido);
+}
 int ler_estudante(Estudante estudantes[], int contador)
 {
+    char input[MAX_STRING];
     estudantes[contador].id = contador + 1;
     estudantes[contador].numero = ler_numero("Indique o numero do estudante entre", 2000000, 2999999);
 
-    printf("\nIndique o nome do estudante: ");
-    scanf(" %99[^\n]s", estudantes[contador].nome);
+    // Ler nome
+    do {
+        printf("\nIndique o nome do estudante: ");
+        if (fgets(input, MAX_STRING, stdin) != NULL) {
+            // Remover o \n do final da string
+            input[strcspn(input, "\n")] = '\0';
+            
+            // Verificar se o nome não está vazio e contém apenas caracteres válidos
+            int valido = 1;
+            if (strlen(input) == 0) {
+                valido = 0;
+            }
+            for (int i = 0; input[i] != '\0' && valido; i++) {
+                if (!isalpha(input[i]) && input[i] != ' ') {
+                    valido = 0;
+                }
+            }
+            
+            if (valido) {
+                strcpy(estudantes[contador].nome, input);
+                break;
+            }
+        }
+        printf("Nome invalido! Use apenas letras e espacos.\n");
+    } while (1);
 
-    printf("\nIndique o email do estudante: ");
-    scanf(" %99[^\n]s", estudantes[contador].email);
+    // Ler email usando a nova função de validação
+    ler_email(estudantes[contador].email);
 
     return contador + 1;
 }
