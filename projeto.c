@@ -46,7 +46,7 @@ typedef struct {
     int classificacao;
 } Submissao;
 
-// Funções auxiliares básicas
+// Funções de validação
 int tem_letra(char c) {
     return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
@@ -59,80 +59,58 @@ int tem_alfanumerico(char c) {
     return tem_letra(c) || tem_numero(c);
 }
 
-// Validação de email básica
-int validar_email(const char *email) {
-    int tem_arroba = 0, tem_ponto = 0;
-    int pos_arroba = -1, pos_ponto = -1;
-    int len = strlen(email);
-    
-    if (len == 0 || len >= MAX_STRING) return 0;
-    
-    for (int i = 0; i < len; i++) {
-        if (!tem_alfanumerico(email[i]) && email[i] != '@' && email[i] != '.' && 
-            email[i] != '-' && email[i] != '_') return 0;
-        if (email[i] == '@') {
-            if (tem_arroba) return 0;
-            tem_arroba = 1;
-            pos_arroba = i;
-        }
-        if (email[i] == '.') {
-            tem_ponto = 1;
-            pos_ponto = i;
-        }
-    }
-    
-    return tem_arroba && tem_ponto && pos_arroba > 0 && 
-           pos_ponto > pos_arroba + 1 && pos_ponto < len - 1;
+// Função para limpar buffer do teclado
+void limpar_buffer() {
+    char c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void ler_email(char *email) {
-    char input[MAX_STRING];
-    int valido = 0;
-    
+// Função para ler números
+int ler_numero(char texto[], int min, int max) {
+    int valor;
     do {
-        printf("\nIndique o email do estudante: ");
-        if (fgets(input, MAX_STRING, stdin) != NULL) {
-            input[strcspn(input, "\n")] = '\0';
-            if (validar_email(input)) {
-                strcpy(email, input);
-                valido = 1;
-            } else {
-                printf("Email invalido! Formato: exemplo@dominio.pt\n");
-            }
-        }
-    } while (!valido);
+        printf("\n%s [%d-%d]--> ", texto, min, max);
+        scanf("%d", &valor);
+        limpar_buffer();
+        if (valor < min || valor > max)
+            printf("\nValor incorreto");
+    } while (valor < min || valor > max);
+    return valor;
 }
 
-int validar_nome(const char *nome) {
-    if (strlen(nome) == 0 || strlen(nome) >= MAX_STRING) return 0;
-    for (int i = 0; nome[i] != '\0'; i++) {
-        if (!tem_letra(nome[i]) && nome[i] != ' ') return 0;
+// Função para validar nome
+int validar_nome(char nome[]) {
+    for(int i = 0; nome[i] != '\0'; i++) {
+        if(!tem_letra(nome[i]) && nome[i] != ' ')
+            return 0;
     }
     return 1;
 }
 
-int ler_numero(char texto[], int min, int max) {
-    char input[100];
-    int valor, valido;
-    
+// Função para ler nome
+void ler_nome(char nome[]) {
+    int valido = 0;
     do {
-        valido = 1;
-        printf("\n%s [%d-%d]--> ", texto, min, max);
-        if (fgets(input, sizeof(input), stdin) != NULL) {
-            input[strcspn(input, "\n")] = '\0';
-            for (int i = 0; input[i] != '\0' && valido; i++) {
-                if (!tem_numero(input[i])) valido = 0;
-            }
-            if (valido) {
-                valor = atoi(input);
-                if (valor < min || valor > max) valido = 0;
-            }
-        } else valido = 0;
-        
-        if (!valido) printf("\nEntrada invalida. Tente novamente.");
+        printf("\nIndique o nome: ");
+        scanf(" %99[^\n]s", nome);
+        limpar_buffer();
+        valido = validar_nome(nome);
+        if (!valido) printf("Nome invalido! Use apenas letras e espacos.\n");
     } while (!valido);
-    
-    return valor;
+}
+
+// Função para ler email
+void ler_email(char email[]) {
+    int valido = 0;
+    do {
+        printf("\nIndique o email: ");
+        scanf(" %99[^\n]s", email);
+        limpar_buffer();
+        if (strchr(email, '@') && strchr(email, '.'))
+            valido = 1;
+        else
+            printf("Email invalido! Deve conter @ e .\n");
+    } while (!valido);
 }
 
 Data ler_data() {
@@ -181,22 +159,9 @@ void ler_tipo(char tipo[]) {
 }
 
 int ler_estudante(Estudante estudantes[], int contador) {
-    char input[MAX_STRING];
-    int valido = 0;
     estudantes[contador].id = contador + 1;
     estudantes[contador].numero = ler_numero("Indique o numero do estudante entre", 2000000, 2999999);
-
-    do {
-        printf("\nIndique o nome do estudante: ");
-        if (fgets(input, MAX_STRING, stdin) != NULL) {
-            input[strcspn(input, "\n")] = '\0';
-            if (validar_nome(input)) {
-                strcpy(estudantes[contador].nome, input);
-                valido = 1;
-            } else printf("Nome invalido! Use apenas letras e espacos.\n");
-        }
-    } while (!valido);
-
+    ler_nome(estudantes[contador].nome);
     ler_email(estudantes[contador].email);
     return contador + 1;
 }
@@ -622,8 +587,7 @@ int main() {
                 
             case 6:  // Gravar Dados
                 gravar_dados(estudantes, num_estudantes,
-                           fichas, num_fichas,
-                           exercicios, num_exercicios,
+                           fichas, num_fichas,d
                            submissoes, num_submissoes);
                 break;
                 
