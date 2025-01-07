@@ -8,7 +8,7 @@
 #define MAX_SUBMISSOES 10000
 #define MAX_STRING 100
 
-// Estrutura para Data
+// Estrutura de data
 typedef struct {
     int dia, mes, ano;
 } Data;
@@ -47,16 +47,16 @@ typedef struct {
 } Submissao;
 
 // Funções auxiliares básicas
-int eh_letra(char c) {
+int tem_letra(char c) {
     return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
 
-int eh_numero(char c) {
+int tem_numero(char c) {
     return (c >= '0' && c <= '9');
 }
 
-int eh_alfanumerico(char c) {
-    return eh_letra(c) || eh_numero(c);
+int tem_alfanumerico(char c) {
+    return tem_letra(c) || tem_numero(c);
 }
 
 // Validação de email básica
@@ -68,7 +68,7 @@ int validar_email(const char *email) {
     if (len == 0 || len >= MAX_STRING) return 0;
     
     for (int i = 0; i < len; i++) {
-        if (!eh_alfanumerico(email[i]) && email[i] != '@' && email[i] != '.' && 
+        if (!tem_alfanumerico(email[i]) && email[i] != '@' && email[i] != '.' && 
             email[i] != '-' && email[i] != '_') return 0;
         if (email[i] == '@') {
             if (tem_arroba) return 0;
@@ -97,7 +97,7 @@ void ler_email(char *email) {
                 strcpy(email, input);
                 valido = 1;
             } else {
-                printf("Email invalido! Formato: exemplo@dominio.com\n");
+                printf("Email invalido! Formato: exemplo@dominio.pt\n");
             }
         }
     } while (!valido);
@@ -106,7 +106,7 @@ void ler_email(char *email) {
 int validar_nome(const char *nome) {
     if (strlen(nome) == 0 || strlen(nome) >= MAX_STRING) return 0;
     for (int i = 0; nome[i] != '\0'; i++) {
-        if (!eh_letra(nome[i]) && nome[i] != ' ') return 0;
+        if (!tem_letra(nome[i]) && nome[i] != ' ') return 0;
     }
     return 1;
 }
@@ -121,7 +121,7 @@ int ler_numero(char texto[], int min, int max) {
         if (fgets(input, sizeof(input), stdin) != NULL) {
             input[strcspn(input, "\n")] = '\0';
             for (int i = 0; input[i] != '\0' && valido; i++) {
-                if (!eh_numero(input[i])) valido = 0;
+                if (!tem_numero(input[i])) valido = 0;
             }
             if (valido) {
                 valor = atoi(input);
@@ -159,9 +159,9 @@ void ler_dificuldade(char dificuldade[]) {
     } while (opcao < 1 || opcao > 3);
     
     switch(opcao) {
-        case 1: strcpy(dificuldade, "baixo"); break;
-        case 2: strcpy(dificuldade, "medio"); break;
-        case 3: strcpy(dificuldade, "elevado"); break;
+        case 1: strcpy(dificuldade, "Baixo"); break;
+        case 2: strcpy(dificuldade, "Medio"); break;
+        case 3: strcpy(dificuldade, "Alto"); break;
     }
 }
 
@@ -632,9 +632,6 @@ int main() {
                                     fichas, &num_fichas,
                                     exercicios, &num_exercicios,
                                     submissoes, &num_submissoes)) {
-                    printf("\nDados carregados com sucesso!");
-                } else {
-                    printf("\nErro ao carregar dados!");
                 }
                 getchar(); getchar();
                 break;
