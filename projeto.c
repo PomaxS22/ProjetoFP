@@ -8,7 +8,7 @@
 #define MAX_SUBMISSOES 10000
 #define MAX_STRING 100
 
-// Estrutura de data
+// Estrutura para Data
 typedef struct {
     int dia, mes, ano;
 } Data;
@@ -46,71 +46,16 @@ typedef struct {
     int classificacao;
 } Submissao;
 
-// Funções de validação
-int tem_letra(char c) {
-    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-}
-
-int tem_numero(char c) {
-    return (c >= '0' && c <= '9');
-}
-
-int tem_alfanumerico(char c) {
-    return tem_letra(c) || tem_numero(c);
-}
-
-// Função para limpar buffer do teclado
-void limpar_buffer() {
-    char c;
-    while ((c = getchar()) != '\n' && c != EOF);
-}
-
-// Função para ler números
+// Funções de Leitura de Dados Básicos
 int ler_numero(char texto[], int min, int max) {
     int valor;
     do {
         printf("\n%s [%d-%d]--> ", texto, min, max);
         scanf("%d", &valor);
-        limpar_buffer();
         if (valor < min || valor > max)
             printf("\nValor incorreto");
     } while (valor < min || valor > max);
     return valor;
-}
-
-// Função para validar nome
-int validar_nome(char nome[]) {
-    for(int i = 0; nome[i] != '\0'; i++) {
-        if(!tem_letra(nome[i]) && nome[i] != ' ')
-            return 0;
-    }
-    return 1;
-}
-
-// Função para ler nome
-void ler_nome(char nome[]) {
-    int valido = 0;
-    do {
-        printf("\nIndique o nome: ");
-        scanf(" %99[^\n]s", nome);
-        limpar_buffer();
-        valido = validar_nome(nome);
-        if (!valido) printf("Nome invalido! Use apenas letras e espacos.\n");
-    } while (!valido);
-}
-
-// Função para ler email
-void ler_email(char email[]) {
-    int valido = 0;
-    do {
-        printf("\nIndique o email: ");
-        scanf(" %99[^\n]s", email);
-        limpar_buffer();
-        if (strchr(email, '@') && strchr(email, '.'))
-            valido = 1;
-        else
-            printf("Email invalido! Deve conter @ e .\n");
-    } while (!valido);
 }
 
 Data ler_data() {
@@ -130,16 +75,16 @@ void ler_dificuldade(char dificuldade[]) {
     printf("\n1 - Baixo");
     printf("\n2 - Medio");
     printf("\n3 - Elevado");
+    
     do {
         printf("\nOpcao--> ");
         scanf("%d", &opcao);
-        while (getchar() != '\n');
     } while (opcao < 1 || opcao > 3);
     
     switch(opcao) {
-        case 1: strcpy(dificuldade, "Baixo"); break;
-        case 2: strcpy(dificuldade, "Medio"); break;
-        case 3: strcpy(dificuldade, "Alto"); break;
+        case 1: strcpy(dificuldade, "baixo"); break;
+        case 2: strcpy(dificuldade, "medio"); break;
+        case 3: strcpy(dificuldade, "elevado"); break;
     }
 }
 
@@ -152,17 +97,25 @@ void ler_tipo(char tipo[]) {
     do {
         printf("\nOpcao--> ");
         scanf("%d", &opcao);
-        while (getchar() != '\n');
     } while (opcao != 1 && opcao != 2);
     
-    strcpy(tipo, (opcao == 1) ? "algoritmo" : "codigo");
+    if (opcao == 1)
+        strcpy(tipo, "algoritmo");
+    else
+        strcpy(tipo, "codigo");
 }
 
+// MÓDULO DE ESTUDANTES
 int ler_estudante(Estudante estudantes[], int contador) {
     estudantes[contador].id = contador + 1;
     estudantes[contador].numero = ler_numero("Indique o numero do estudante entre", 2000000, 2999999);
-    ler_nome(estudantes[contador].nome);
-    ler_email(estudantes[contador].email);
+    
+    printf("\nIndique o nome do estudante: ");
+    scanf(" %99[^\n]s", estudantes[contador].nome);
+    
+    printf("\nIndique o email do estudante: ");
+    scanf(" %99[^\n]s", estudantes[contador].email);
+    
     return contador + 1;
 }
 
@@ -180,22 +133,13 @@ void mostrar_estudantes(Estudante estudantes[], int contador) {
     getchar(); getchar();
 }
 
+// MÓDULO DE FICHAS
 int ler_ficha(Ficha fichas[], int contador) {
     fichas[contador].id = contador + 1;
-    char input[MAX_STRING];
-    int valido = 0;
     
-    do {
-        printf("\nIndique o nome da ficha: ");
-        if (fgets(input, MAX_STRING, stdin) != NULL) {
-            input[strcspn(input, "\n")] = '\0';
-            if (strlen(input) > 0 && strlen(input) < MAX_STRING) {
-                strcpy(fichas[contador].nome, input);
-                valido = 1;
-            }
-        }
-    } while (!valido);
-
+    printf("\nIndique o nome da ficha: ");
+    scanf(" %99[^\n]s", fichas[contador].nome);
+    
     fichas[contador].num_exercicios = ler_numero("Indique o numero de exercicios", 1, MAX_EXERCICIOS);
     fichas[contador].data_publicacao = ler_data();
     
@@ -219,22 +163,13 @@ void mostrar_fichas(Ficha fichas[], int contador) {
     getchar(); getchar();
 }
 
+// MÓDULO DE EXERCÍCIOS
 int ler_exercicio(Exercicio exercicios[], int contador, int id_ficha) {
     exercicios[contador].id = contador + 1;
     exercicios[contador].id_ficha = id_ficha;
-    char input[MAX_STRING];
-    int valido = 0;
     
-    do {
-        printf("\nIndique o nome do exercicio: ");
-        if (fgets(input, MAX_STRING, stdin) != NULL) {
-            input[strcspn(input, "\n")] = '\0';
-            if (strlen(input) > 0 && strlen(input) < MAX_STRING) {
-                strcpy(exercicios[contador].nome, input);
-                valido = 1;
-            }
-        }
-    } while (!valido);
+    printf("\nIndique o nome do exercicio: ");
+    scanf(" %99[^\n]s", exercicios[contador].nome);
     
     ler_dificuldade(exercicios[contador].dificuldade);
     ler_tipo(exercicios[contador].tipo);
@@ -257,27 +192,38 @@ void mostrar_exercicios(Exercicio exercicios[], int contador) {
     getchar(); getchar();
 }
 
+// MÓDULO DE SUBMISSÕES
 int ler_submissao(Submissao submissoes[], int contador, 
                   Estudante estudantes[], int num_estudantes,
                   Ficha fichas[], int num_fichas,
                   Exercicio exercicios[], int num_exercicios) {
                       
+    int id_estudante, id_ficha, id_exercicio;
+    
+    // Verificar se existem dados necessários
     if (num_estudantes == 0 || num_fichas == 0 || num_exercicios == 0) {
         printf("\nNao existem dados suficientes para registrar submissao!");
         getchar(); getchar();
         return contador;
     }
     
+    // Preencher dados
     submissoes[contador].id = contador + 1;
     
+    // Selecionar estudante
     mostrar_estudantes(estudantes, num_estudantes);
-    submissoes[contador].id_estudante = ler_numero("Indique o ID do estudante", 1, num_estudantes);
+    id_estudante = ler_numero("Indique o ID do estudante", 1, num_estudantes);
+    submissoes[contador].id_estudante = id_estudante;
     
+    // Selecionar ficha
     mostrar_fichas(fichas, num_fichas);
-    submissoes[contador].id_ficha = ler_numero("Indique o ID da ficha", 1, num_fichas);
+    id_ficha = ler_numero("Indique o ID da ficha", 1, num_fichas);
+    submissoes[contador].id_ficha = id_ficha;
     
+    // Selecionar exercício
     mostrar_exercicios(exercicios, num_exercicios);
-    submissoes[contador].id_exercicio = ler_numero("Indique o ID do exercicio", 1, num_exercicios);
+    id_exercicio = ler_numero("Indique o ID do exercicio", 1, num_exercicios);
+    submissoes[contador].id_exercicio = id_exercicio;
     
     submissoes[contador].data = ler_data();
     submissoes[contador].num_linhas = ler_numero("Indique o numero de linhas", 1, 1000);
@@ -306,15 +252,23 @@ void mostrar_submissoes(Submissao submissoes[], int contador) {
     getchar(); getchar();
 }
 
+// MÓDULO DE ESTATÍSTICAS
 void calcular_estatisticas(Submissao submissoes[], int num_submissoes,
                           Estudante estudantes[], int num_estudantes,
                           Ficha fichas[], int num_fichas) {
-    int id_estudante, total_submissoes = 0;
-    float soma_classificacoes = 0, media_classificacoes, percentagem_exercicios;
+                              
+    int id_estudante, id_ficha;
+    int total_submissoes;
+    float media_classificacoes;
+    float percentagem_exercicios;
     
+    // Mostrar estudantes disponíveis
     mostrar_estudantes(estudantes, num_estudantes);
     id_estudante = ler_numero("Indique o ID do estudante para estatisticas", 1, num_estudantes);
     
+    // Calcular total de submissões do estudante
+    total_submissoes = 0;
+    float soma_classificacoes = 0;
     for (int i = 0; i < num_submissoes; i++) {
         if (submissoes[i].id_estudante == id_estudante) {
             total_submissoes++;
@@ -322,12 +276,14 @@ void calcular_estatisticas(Submissao submissoes[], int num_submissoes,
         }
     }
     
+    // Calcular média das classificações
     media_classificacoes = total_submissoes > 0 ? soma_classificacoes / total_submissoes : 0;
     
     printf("\n\nEstatisticas do Estudante ID %d:", id_estudante);
     printf("\nTotal de submissoes: %d", total_submissoes);
     printf("\nMedia das classificacoes: %.2f", media_classificacoes);
     
+    // Calcular percentagem de exercícios por ficha
     printf("\n\nPercentagem de exercicios resolvidos por ficha:");
     for (int i = 0; i < num_fichas; i++) {
         int exercicios_resolvidos = 0;
@@ -344,6 +300,7 @@ void calcular_estatisticas(Submissao submissoes[], int num_submissoes,
     getchar(); getchar();
 }
 
+// FUNÇÕES DE ARQUIVO
 void gravar_dados(Estudante estudantes[], int num_estudantes,
                  Ficha fichas[], int num_fichas,
                  Exercicio exercicios[], int num_exercicios,
@@ -352,11 +309,13 @@ void gravar_dados(Estudante estudantes[], int num_estudantes,
     FILE *ficheiro = fopen("dados.dat", "wb");
     
     if (ficheiro != NULL) {
+        // Gravar contadores
         fwrite(&num_estudantes, sizeof(int), 1, ficheiro);
         fwrite(&num_fichas, sizeof(int), 1, ficheiro);
         fwrite(&num_exercicios, sizeof(int), 1, ficheiro);
         fwrite(&num_submissoes, sizeof(int), 1, ficheiro);
         
+        // Gravar dados
         fwrite(estudantes, sizeof(Estudante), num_estudantes, ficheiro);
         fwrite(fichas, sizeof(Ficha), num_fichas, ficheiro);
         fwrite(exercicios, sizeof(Exercicio), num_exercicios, ficheiro);
@@ -382,11 +341,13 @@ int ler_dados_arquivo(Estudante estudantes[], int *num_estudantes,
         return 0;
     }
     
+    // Ler contadores
     fread(num_estudantes, sizeof(int), 1, ficheiro);
     fread(num_fichas, sizeof(int), 1, ficheiro);
     fread(num_exercicios, sizeof(int), 1, ficheiro);
     fread(num_submissoes, sizeof(int), 1, ficheiro);
     
+    // Ler dados
     fread(estudantes, sizeof(Estudante), *num_estudantes, ficheiro);
     fread(fichas, sizeof(Ficha), *num_fichas, ficheiro);
     fread(exercicios, sizeof(Exercicio), *num_exercicios, ficheiro);
@@ -397,8 +358,40 @@ int ler_dados_arquivo(Estudante estudantes[], int *num_estudantes,
     return 1;
 }
 
-int menu_principal() {
+// Menus
+int ler_opcao_menu(int min, int max) {
     int opcao;
+    char input[100];
+    int valido;
+    
+    do {
+        printf("\nOpcao--> ");
+        scanf(" %99[^\n]", input);
+        valido = 1;
+        
+        // Limpar o buffer do teclado
+        while (getchar() != '\n');
+        
+        // Verificar se é um número
+        for(int i = 0; input[i] != '\0'; i++) {
+            if(input[i] < '0' || input[i] > '9') {
+                valido = 0;
+                break;
+            }
+        }
+        
+        if(valido) {
+            opcao = atoi(input);
+            if(opcao >= min && opcao <= max) {
+                return opcao;
+            }
+        }
+        
+        printf("\nOpcao invalida! Digite um numero entre %d e %d.", min, max);
+    } while(1);
+}
+
+int menu_principal() {
     printf("\n\t##### MENU PRINCIPAL #####");
     printf("\n1 - Gestao de Estudantes");
     printf("\n2 - Gestao de Fichas");
@@ -408,66 +401,49 @@ int menu_principal() {
     printf("\n6 - Gravar Dados");
     printf("\n7 - Carregar Dados");
     printf("\n0 - Sair");
-    printf("\nOpcao--> ");
-    scanf("%d", &opcao);
-    while (getchar() != '\n');
-    return opcao;
+    return ler_opcao_menu(0, 7);
 }
 
 int menu_estudantes() {
-    int opcao;
     printf("\n\t##### MENU ESTUDANTES #####");
     printf("\n1 - Inserir novo estudante");
     printf("\n2 - Listar estudantes");
     printf("\n0 - Voltar");
-    printf("\nOpcao--> ");
-    scanf("%d", &opcao);
-    while (getchar() != '\n');
-    return opcao;
+    return ler_opcao_menu(0, 2);
 }
 
 int menu_fichas() {
-    int opcao;
     printf("\n\t##### MENU FICHAS #####");
     printf("\n1 - Inserir nova ficha");
     printf("\n2 - Listar fichas");
     printf("\n0 - Voltar");
-    printf("\nOpcao--> ");
-    scanf("%d", &opcao);
-    while (getchar() != '\n');
-    return opcao;
+    return ler_opcao_menu(0, 2);
 }
 
 int menu_exercicios() {
-    int opcao;
     printf("\n\t##### MENU EXERCICIOS #####");
     printf("\n1 - Inserir novo exercicio");
     printf("\n2 - Listar exercicios");
     printf("\n0 - Voltar");
-    printf("\nOpcao--> ");
-    scanf("%d", &opcao);
-    while (getchar() != '\n');
-    return opcao;
+    return ler_opcao_menu(0, 2);
 }
 
 int menu_submissoes() {
-    int opcao;
     printf("\n\t##### MENU SUBMISSOES #####");
     printf("\n1 - Registar nova submissao");
     printf("\n2 - Listar submissoes");
     printf("\n0 - Voltar");
-    printf("\nOpcao--> ");
-    scanf("%d", &opcao);
-    while (getchar() != '\n');
-    return opcao;
+    return ler_opcao_menu(0, 2);
 }
 
 int main() {
+    // Declaração das estruturas de dados
     Estudante estudantes[MAX_ESTUDANTES];
     Ficha fichas[MAX_FICHAS];
     Exercicio exercicios[MAX_EXERCICIOS * MAX_FICHAS];
     Submissao submissoes[MAX_SUBMISSOES];
     
+    // Contadores
     int num_estudantes = 0;
     int num_fichas = 0;
     int num_exercicios = 0;
@@ -476,7 +452,7 @@ int main() {
     int opcao_principal, opcao_secundaria;
     
     do {
-        system("cls");
+        system("cls");  // Limpa a tela
         opcao_principal = menu_principal();
         
         switch (opcao_principal) {
@@ -587,7 +563,8 @@ int main() {
                 
             case 6:  // Gravar Dados
                 gravar_dados(estudantes, num_estudantes,
-                           fichas, num_fichas,d
+                           fichas, num_fichas,
+                           exercicios, num_exercicios,
                            submissoes, num_submissoes);
                 break;
                 
@@ -596,6 +573,9 @@ int main() {
                                     fichas, &num_fichas,
                                     exercicios, &num_exercicios,
                                     submissoes, &num_submissoes)) {
+                    printf("\nDados carregados com sucesso!");
+                } else {
+                    printf("\nErro ao carregar dados!");
                 }
                 getchar(); getchar();
                 break;
